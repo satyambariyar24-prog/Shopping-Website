@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="satyam.css">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap" rel="stylesheet">
+    <title>Project</title>
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const cartCount = document.getElementById("cart-count");
+  const cartItemsEl = document.getElementById("cart-items");
+  const cartTotalEl = document.getElementById("cart-total");
+
+  // Extract product info from card
+  function getProductData(btn) {
+    const card = btn.closest(".card");
+    return {
+      id: card.querySelector("img").src,
+      name: card.querySelectorAll(".card-text")[0].innerText,
+      price: parseInt(card.querySelectorAll(".card-text")[1].innerText.replace("$","")),
+      image: card.querySelector("img").src,
+      qty: 1
+    };
+  }
+
+  // Add to cart
+  document.querySelectorAll(".btn.btn-secondary").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const product = getProductData(btn);
+      const existing = cart.find(item => item.id === product.id);
+
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push(product);
+      }
+
+      updateCart();
+    });
+  });
+
+  function updateCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+    
+    renderCart();
+  }
+
+  function renderCart() {
+    cartItemsEl.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      total += item.price * item.qty;
+
+      cartItemsEl.innerHTML += `
+        <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+          <img src="${item.image}" width="70" class="me-3">
+          <div class="flex-grow-1">
+            <h6>${item.name}</h6>
+            <p>$${item.price}</p>
+            <div class="btn-group">
+              <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${index}, -1)">−</button>
+              <span class="btn btn-light btn-sm">${item.qty}</span>
+              <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${index}, 1)">+</button>
+            </div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="removeItem(${index})">Remove</button>
+        </div>
+      `;
+    });
+
+    cartTotalEl.textContent = total;
+  }
+
+  window.changeQty = function (index, change) {
+    cart[index].qty += change;
+    if (cart[index].qty <= 0) cart.splice(index, 1);
+    updateCart();
+  };
+
+  window.removeItem = function (index) {
+    cart.splice(index, 1);
+    updateCart();
+  };
+
+  updateCart();
+});
+</script>
+
+
+   
+</head>
+<body>
+    <div class="container-fluid">
+    <header>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg bg-white ps-4">
+  <div class="container-fluid ms-5">
+    <a class="navbar-brand fs-1" href="#">HUSK</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active ms-6" aria-current="page" href="#">New Arrival</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Men</a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link" href="#">Women</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Accessories
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Smart TVs</a></li>
+            <li><a class="dropdown-item" href="#">Premium Watches</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Mobile</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="image">
+ <div class="position-relative" data-bs-toggle="modal" data-bs-target="#cartModal" style="cursor:pointer;">
+  <!-- bag SVG here -->
+  <span id="cart-count"
+        > 
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bag-heart" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M14 14V5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1M8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132"/>
+</svg>
+</span>
+</div>
+
+
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+</svg>
+</div>
+</nav>
+    </div>
+    </header>
+    <section>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6 col-12">
+            <h1 class="fs-1">Elevate Your <br> <span class="text-primary">Style</span></h1>
+        <pre class="fs-6">Discover premium products that blend elegance with functionality.
+Shop the latest trends and 
+timeless classics </pre>
+<button type="button" class="btn btn-secondary btn-lg ms-2">Shop Now</button>
+<button type="button" class="btn btn-light btn-lg ms-3">View Collections</button>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 col-12">
+                <img src="tv.jpg" alt="smarttv">
+        
+        </div>
+    
+    </div>
+    </section>
+    <div class="horsy">
+        <div class="first">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
+  <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.732 11h5.536a2 2 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456M12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+</svg>
+<h2>Free Shipping</h2>
+<p>On Order over $50</p>
+</div>
+<div class="second">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-shield" viewBox="0 0 16 16">
+  <path d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.7 10.7 0 0 0 2.287 2.233c.346.244.652.42.893.533q.18.085.293.118a1 1 0 0 0 .101.025 1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
+</svg>
+<h2>2 Year Warranty</h2>
+<p>Full Product Protection</p>
+</div>
+<div class="third">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+  <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+  <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+</svg>
+<h2>Secure Payment</h2>
+<p>100% Protected Transaction</p>
+</div>
+    </div>
+    <div class="product">
+      <div class="row">
+        <div class="col-sm-12 col-md-4 col-lg-4 col-12">
+          <h3>Feature Products</h3>
+          <pre>Handpicked Selection
+of best Selling Item
+          </pre>
+        </div>
+        <div class="col-sm-12 col-md-4 col-lg-4 col-12">
+          <button type="button" class="btn btn-dark ">All</button>
+          <button type="button" class="btn btn-light">Men Collection</button>
+          <button type="button" class="btn btn-light">Women Collection</button>
+          <button type="button" class="btn btn-light">Bags</button>
+          <button type="button" class="btn btn-light">Watches</button>
+          <button type="button" class="btn btn-light">Footwear</button>
+          <button type="button" class="btn btn-light">Electronics</button>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-4 col-12">
+            <button type="button" class="btn btn-light">Other Collection</button>
+          </div>
+        
+          
+          <div class="col-sm-12 col-md-6 col-lg-6 col-12">
+            <div class="card mb-5" style="width: 30rem;">
+  <img src="jackets.avif" class="card-img-top" alt="jacket">
+  <div class="card-body">
+    <p class="card-text">Best Premium Jackets</p>
+    <p class="card-text">$499</p>
+    <button class="btn btn-secondary">Add to Cart</button>
+  </div>
+</div>
+<div class="card" style="width: 30rem;">
+  <img src="t-shirts.avif" class="card-img-top" alt="t-shirt">
+  <div class="card-body">
+    <p class="card-text">Classic T-shirts</p>
+    <p class="card-text">$399</p>
+    <button class="btn btn-secondary">Add to Cart</button>
+  </div>
+</div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6 col-12">
+            <div class="card mb-5" style="width: 30rem;">
+  <img src="jeans.avif" class="card-img-top" alt="jeans">
+  <div class="card-body">
+    <p class="card-text">Party Wear Jeans</p>
+    <p class="card-text">$119</p>
+    <button class="btn btn-secondary">Add to cart</button>
+  </div>
+</div>
+    <p class="card-text">
+<div class="card" style="width: 30rem;">
+  <img src="mens.avif" class="card-img-top" alt="mens">
+  <div class="card-body">
+    <p class="card-text">Full Party Wear Collection</p>
+    <p class="card-text">Only $299</p>
+    <button class="btn btn-secondary">Add to cart</button>
+  </div>
+</div>
+          </div>
+</div>      
+    </div>
+    <footer>
+   <div class="discription">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <h4>Husk</h4>
+        <p>Premium Style Products for modern world</p>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+          <h4>Shop</h4>
+          <p class="m-0"> New Arrival</p>
+            <p class="m-0">Best Sellers</p>
+            <p>Sale</p>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+          <h4>Support</h4>
+          <p class="m-0">Contact Us</p>
+            <p class="m-0">Shipping Off</p>
+            <p>Returns</p>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+          <h4>Company</h4>
+          <p class="m-0">About Us</p>
+          <p class="m-0">Carrers</p>  
+        </div>
+</div> 
+<hr/>
+<div class="predis">
+  <p class="text-center"> 2025 LUXE. All rights reserved.</p>
+  </div> 
+</div>
+</footer>
+
+    </div>
+    <!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Your Cart</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="cart-items"></div>
+        <h5 class="text-end mt-3">
+          Total: $<span id="cart-total">0</span>
+        </h5>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+        <a href="#" class="btn btn-dark">Go to Cart Page</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  
+    
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+<script src="cj.js"></script>
+</body>
+</html>
